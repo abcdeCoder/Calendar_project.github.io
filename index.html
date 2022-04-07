@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <title>Full Claendar</title>
+    <meta charset='utf-8' />
+    <link href='./css/fullcalendar.css' rel='stylesheet' />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js"></script>
+    <script src='./js/fullcalendar.js'></script>
+
+    <style>
+        body {
+            padding: 0;
+            font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+            font-size: 14px;
+        }
+        
+        #calendar {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div id='calendar'></div>
+
+        <div class="modal fade " id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content ">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="needs-validation p-4" id="abc" novalidate>
+                            <div class="row form-group">
+                                <div class="col form-control">
+                                    <lable class="col-5">Event Name</lable>
+                                    <input type="text" class="col-7" id="name" pattern="^([a-zA-Z'-.]+(?: [a-zA-Z'-.]+)?)$" required /><br />
+                                    <div class="valid-feedback">
+                                        Done!
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        Please enter Name.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row form-group">
+                                <div class="col form-control">
+                                    <lable class="col-5">mobile No -</lable>
+                                    <input class="col-7" type="tel" maxlength="10" id="mobile" pattern="[0-9]{10}" required />
+                                    <div class="valid-feedback">
+                                        Done!
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        Please enter mobileno.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col form-control">
+                                    <label for="branchName" class="col-5">color</label>
+                                    <select class="custom-select form-control col-7" id="color" required>
+                                        <option selected disabled value="">Choose...</option>
+                                        <option value="red">red</option>
+                                        <option value="blue">blue</option>
+                                        <option value="green">green</option>
+                                        <option value="gray">gray</option>
+                                    </select>
+                                    <div class="valid-feedback">
+                                        Done!
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        Please enter Branch Name.
+                                    </div>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancle event</button>
+                        <button type="button" class="btn btn-primary" id="addevent">Add event</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var calendar = null;
+        var current_event_obj = null;
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialDate: '2022-01-30',
+                initialView: 'timeGridWeek',
+                nowIndicator: true,
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+                },
+                navLinks: true,
+                editable: true,
+                selectable: true,
+                selectMirror: true,
+                dayMaxEvents: true,
+                select: function(arg) {
+                    $("#myModal").modal('show');
+                    current_event_obj = arg;
+                },
+                eventClick: function(arg) {
+                    swal.fire({
+                        text: "Are you sure you want to delete this event?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        buttonsStyling: false,
+                        confirmButtonText: "Yes, delete it!",
+                        cancelButtonText: "No, return",
+                        customClass: {
+                            confirmButton: "btn btn-danger mr-3",
+                            cancelButton: "btn btn-active-light"
+                        }
+                    }).then(function(result) {
+                        if (result.value) {
+                            arg.event.remove()
+                        } else if (result.dismiss === "cancel") {
+                            Swal.fire({
+                                text: "Event was not deleted!.",
+                                icon: "error",
+                                buttonsStyling: false,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn btn-info",
+                                }
+                            });
+                        }
+                    });
+                },
+            });
+            calendar.render();
+        });
+
+        $("#addevent").click(function() {
+            arg = current_event_obj;
+            var name = $("#name").val();
+            var number = $("#mobile").val();
+            var color = $("#color").val();
+            calendar.addEvent({
+                title: name + ":" + number,
+                start: arg.start,
+                end: arg.end,
+                color: color,
+
+            });
+            $("#myModal").modal('hide');
+        });
+    </script>
+</body>
+
+</html>
